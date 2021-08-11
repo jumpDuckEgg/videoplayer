@@ -1,0 +1,7 @@
+{
+    "files": [
+        "src/*.(js|vue)", 
+        "src/**/*.(js|vue)"
+    ],
+    "ignoreFiles": ["scss/*","plugins/*.js","plugins/**/*.js"]
+}
