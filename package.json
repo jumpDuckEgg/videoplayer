@@ -1,6 +1,6 @@
 {
   "name": "duckegg-player",
-  "version": "3.4.7",
+  "version": "1.0.0",
   "description": "duckegg-player",
   "main": "./src/index.js",
   "scripts": {
