@@ -139,7 +139,6 @@
 </template>
 <script>
 import VideoPlayer from "./video";
-// import mp4player from "./../plugins/mvideoplayer-mp4/src/index.js";
 
 import longPress from "./longpress-directive";
 import volumeControl from "./volume-control";
@@ -147,11 +146,10 @@ import loading from "./loading";
 import bottomBar from "./bottom-controls-bar.vue";
 import screenfull from "screenfull";
 import util, { getParentTag } from "./util";
-import Duration from "./duration.js";
 const { isNeedToAdjustAndroidX5SupportInlinePlayerStyle } = util;
 
 export default {
-    name: "MVideoPlayer",
+    name: "videoPlayer",
     components: {
         volumeControl,
         loading,
@@ -306,7 +304,6 @@ export default {
             bodyHeight: 0, // 屏幕窗口高度
             bodyWidth: 0, // 屏幕窗口宽度
             crossScreenStyle: {},
-            durationReport: null,
             isEnded: true, // 是否结束播放状态
         };
     },
@@ -365,9 +362,6 @@ export default {
         };
     },
     destroyed() {
-        if (this.durationReport && this.durationReport.timer) {
-            this.videoPauseReport();
-        }
         if (this.video) {
             this.video.destroy();
         }
@@ -413,17 +407,6 @@ export default {
                 this.barWidth = this.$refs.progress.getBoundingClientRect().width;
             }
             this.isWaiting = true;
-            if (
-                this.durationProperties &&
-                this.durationProperties.position &&
-                this.durationProperties.item_type
-            ) {
-                this.durationReport = new Duration(
-                    this.durationProperties,
-                    this.mreport,
-                    this
-                );
-            }
             this.video = new VideoPlayer({
                 id: this.vId,
                 autoplay: this.autoPlay,
@@ -464,7 +447,6 @@ export default {
                     self.$emit("videoEnded", mo);
                     self.isEnded = true;
                     console.log("onEnded");
-                    self.videoPauseReport();
                 },
                 onPause: function (mo) {
                     self.status = "暂停";
@@ -479,8 +461,6 @@ export default {
                     }
                     // self.isPlayed = false; // 暂停显示封面图
                     self.$emit("videoPause", mo);
-
-                    self.videoPauseReport();
                 },
                 onPlay: function (mo) {
                     self.status = "播放了";
@@ -488,14 +468,6 @@ export default {
                     self.isWaiting = false;
                     self.isPlaying = true; // 移除播放按钮
                     self.isPlayed = true; // 移除封面
-                    if (self.durationReport) {
-                        if (self.isEnded) {
-                            self.isEnded = false;
-                            self.durationReport.tiggerReport();
-                        } else {
-                            self.durationReport.keepReport();
-                        }
-                    }
                     if (self.isFirstPlayed) {
                         // 标记是否第一次播放
                         self.isFirstPlayed = false;
@@ -561,14 +533,6 @@ export default {
             if (this.video) {
                 this.updateVolume(this.video.volume);
             }
-        },
-        // 视频暂停做一次上报
-        videoPauseReport() {
-            if (!this.durationReport) {
-                return;
-            }
-            this.durationReport.claerTimer();
-            this.durationReport.report(Date.parse(new Date()) / 1000);
         },
         updateVolume(volume) {
             if (!this.video) {

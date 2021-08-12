@@ -1,15 +1,7 @@
 import '../scss/index.scss';
 import videoPlayer from './player.vue';
 
-const install = function (vue, config) {
-    if (config) {
-        if (config.options) {
-            videoPlayer.props.globalOptions.default = () => config.options;
-        }
-        if (config.events) {
-            videoPlayer.props.globalEvents.default = () => config.events;
-        }
-    }
+const install = function (vue) {
     vue.component(videoPlayer.name, videoPlayer);
 };
 
